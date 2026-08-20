@@ -2,33 +2,234 @@
 <html lang="uz">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#090b12" />
-  <title>Daho Code</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <meta name="theme-color" content="#05060d" />
+  <title>Daho · Miya</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <header class="topbar">
-      <div class="brand"><span class="brand-mark">✦</span><div><strong>Daho Code</strong><small>Self-expanding coding agent</small></div></div>
-      <button class="icon-btn" id="connectionBtn" aria-label="Ulanish holati"><span class="status-dot"></span></button>
-    </header>
+<div class="app">
 
-    <main class="screens">
-      <section class="screen active" data-screen="chat">
-        <div class="hero"><p class="eyebrow">AI CODING AGENT</p><h1>Bugun nimani<br><span>quramiz?</span></h1><p class="muted">G‘oyangizni yozing — Daho rejalashtiradi, kodlaydi va ishga tushiradi.</p></div>
-        <div class="model-card"><div><span class="label">MODEL</span><strong id="selectedModel">OpenAI · GPT-4o</strong></div><button class="change-btn" id="modelBtn">O‘zgartirish <span>›</span></button></div>
-        <div class="chat-list" id="chatList"><div class="welcome-card"><span class="spark">✦</span><div><strong>Daho tayyor</strong><p>Men mavjud capability'larimdan foydalanaman. Kerak bo‘lsa, o‘zimga yangi tool yarataman.</p></div></div></div>
-        <div class="composer-wrap"><div class="quick-prompts"><button data-prompt="Loyihamni tahlil qil va yaxshilash rejasini tuz">Loyihani tahlil qil</button><button data-prompt="Menga yangi capability kerak: ">Capability yaratish</button></div><div class="composer"><textarea id="promptInput" rows="1" placeholder="Dahoga topshiriq bering..."></textarea><button class="send-btn" id="sendBtn" aria-label="Yuborish">↑</button></div><small class="hint">Enter — yuborish · Shift+Enter — yangi qator</small></div>
-      </section>
+  <!-- ================= TOPBAR ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="orb-mini" id="orbMini"></span>
+      <div>
+        <strong>Daho</strong>
+        <small id="brandState">miya kutmoqda</small>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="chip-btn" id="tgChip" title="Telegram holati">✈︎<span id="tgState">off</span></button>
+      <button class="chip-btn" id="linkChip" title="Backend holati"><i class="dot"></i><span id="linkState">offline</span></button>
+    </div>
+  </header>
 
-      <section class="screen" data-screen="activity"><div class="section-heading"><div><p class="eyebrow">REAL-TIME</p><h2>Ish jarayoni</h2></div><span class="live-pill"><i></i> LIVE</span></div><div class="progress-card"><div class="progress-top"><strong id="taskStatus">Agent kutmoqda</strong><span id="progressPercent">0%</span></div><div class="progress-bar"><i id="progressBar"></i></div><p id="taskDetail">Yangi topshiriq yuborilganda jarayon shu yerda ko‘rinadi.</p></div><div class="log-card"><div class="card-title"><strong>Agent loglari</strong><button id="clearLogs">Tozalash</button></div><div id="logs"><div class="empty-log">Hozircha loglar yo‘q</div></div></div></section>
+  <main class="screens">
 
-      <section class="screen" data-screen="tools"><div class="section-heading"><div><p class="eyebrow">REGISTRY</p><h2>Capability'lar</h2></div><button class="round-btn" id="refreshTools">↻</button></div><p class="muted intro">Daho hozir nimalarni qila olishini ko‘ring.</p><div class="capability-list" id="capabilityList"></div></section>
+    <!-- ================= MIYA ================= -->
+    <section class="screen active" data-screen="brain">
+      <div class="brain-stage">
+        <div class="orb" id="orb">
+          <div class="orb-core"></div>
+          <div class="orb-ring r1"></div>
+          <div class="orb-ring r2"></div>
+          <div class="orb-ring r3"></div>
+        </div>
+        <p class="stage-eyebrow">YAGONA MIYA</p>
+        <h1 class="stage-title" id="stageTitle">Topshiriqni ayting —<br><span>qolganini men bajaraman</span></h1>
+        <p class="stage-sub" id="stageSub">Rejalashtiraman, kerakli toolni o'zim yozaman, xatoni o'zim tuzataman va tugagach xabar beraman.</p>
+      </div>
 
-      <section class="screen" data-screen="settings"><div class="section-heading"><div><p class="eyebrow">CONFIGURATION</p><h2>Sozlamalar</h2></div></div><div class="settings-group"><span class="group-label">AI PROVIDER</span><label class="field-label">Provayder<select id="providerSelect"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter</option></select></label><label class="field-label">Model<select id="settingsModel"></select></label><label class="field-label">Backend endpoint<input id="endpointInput" type="url" placeholder="https://your-app.up.railway.app" /></label></div><div class="settings-group"><span class="group-label">AGENT MODE</span><label class="toggle-row"><span><strong>Avtomatik self-improvement</strong><small>Testdan so‘ng branch push va deploy</small></span><input id="autoImprove" type="checkbox" checked /><i class="toggle"></i></label><label class="toggle-row"><span><strong>Demo rejim</strong><small>Backend ulanmaganda simulyatsiya</small></span><input id="demoMode" type="checkbox" checked /><i class="toggle"></i></label></div><button class="primary-btn" id="saveSettings">Sozlamalarni saqlash</button><p class="security-note">🔒 API kalitlari bu APK’da saqlanmaydi. Ularni Railway Variables’da sozlang.</p></section>
-    </main>
-    <nav class="bottom-nav"><button class="nav-item active" data-target="chat"><span>⌂</span><small>Chat</small></button><button class="nav-item" data-target="activity"><span>◴</span><small>Jarayon</small></button><button class="nav-item" data-target="tools"><span>◈</span><small>Tools</small></button><button class="nav-item" data-target="settings"><span>⚙</span><small>Sozlamalar</small></button></nav>
-  </div><div class="toast" id="toast"></div><script src="app.js"></script>
+      <div class="live-card hidden" id="liveCard">
+        <div class="live-head">
+          <span class="pulse"></span>
+          <strong id="liveGoal">—</strong>
+          <span class="live-pct" id="livePct">0%</span>
+        </div>
+        <div class="rail"><i id="liveBar"></i></div>
+        <p class="live-step" id="liveStep">Kutilmoqda...</p>
+        <button class="ghost-btn" id="openMission">Jarayonni ochish ›</button>
+      </div>
+
+      <div class="blocker-card hidden" id="blockerCard">
+        <div class="blocker-top"><span>🔐</span><strong id="blockerTitle">Kerak</strong></div>
+        <p id="blockerWhy" class="muted"></p>
+        <div class="blocker-form">
+          <input id="blockerValue" type="password" placeholder="Qiymatni kiriting..." autocomplete="off" />
+          <button class="primary-btn slim" id="blockerSend">Berish</button>
+        </div>
+        <small class="muted">Yoki Telegram'ga <code>key openai QIYMAT</code> deb yozing.</small>
+      </div>
+
+      <div class="feed" id="feed"></div>
+
+      <div class="composer-zone">
+        <div class="quick-row" id="quickRow">
+          <button data-prompt="Loyihamni tahlil qil va yaxshilash rejasini tuz">Loyihani tahlil qil</button>
+          <button data-prompt="Menga shu ishni bajaradigan yangi tool yasa: ">Yangi tool yasa</button>
+          <button data-prompt="Backend'ni tekshir, xatolarni top va tuzat">Xatolarni tuzat</button>
+        </div>
+        <div class="composer">
+          <textarea id="prompt" rows="1" placeholder="Miyaga topshiriq bering..."></textarea>
+          <button class="send" id="send" aria-label="Yuborish">↑</button>
+        </div>
+        <small class="hint">Enter — yuborish · natija Telegram'ga ham tushadi</small>
+      </div>
+    </section>
+
+    <!-- ================= JARAYON ================= -->
+    <section class="screen" data-screen="flow">
+      <div class="head">
+        <div><p class="eyebrow">REAL-TIME</p><h2>Jarayon</h2></div>
+        <select id="missionPick" class="mini-select"></select>
+      </div>
+
+      <div class="flow-summary card">
+        <div class="flow-top">
+          <strong id="flowGoal">Topshiriq tanlanmagan</strong>
+          <span class="badge" id="flowStatus">—</span>
+        </div>
+        <div class="rail"><i id="flowBar"></i></div>
+        <div class="flow-meta">
+          <span id="flowType">—</span><span id="flowModel">—</span><span id="flowTime">—</span>
+        </div>
+        <p class="muted" id="flowUnderstanding"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Qadamlar</strong><span id="stepCount" class="muted"></span></div>
+        <ol class="steps" id="steps"><li class="empty">Topshiriq berilganda qadamlar shu yerda ko'rinadi</li></ol>
+      </div>
+
+      <div class="card result-card hidden" id="resultCard">
+        <div class="card-title"><strong>Natija</strong><button class="mini-btn" id="copyResult">Nusxa</button></div>
+        <div class="result-body" id="resultBody"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Miya loglari</strong><button class="mini-btn" id="clearLogs">Tozalash</button></div>
+        <div class="logs" id="logs"><div class="empty">Loglar yo'q</div></div>
+      </div>
+    </section>
+
+    <!-- ================= TOOLLAR ================= -->
+    <section class="screen" data-screen="tools">
+      <div class="head">
+        <div><p class="eyebrow">O'Z-O'ZINI KENGAYTIRISH</p><h2>Toollar</h2></div>
+        <button class="round-btn" id="reloadTools">↻</button>
+      </div>
+
+      <div class="forge card">
+        <strong>Yangi tool buyurtma qiling</strong>
+        <p class="muted">Nima kerakligini yozing — miya kodini o'zi yozadi, tekshiradi va registrga qo'shadi.</p>
+        <div class="forge-row">
+          <input id="forgeInput" placeholder="Masalan: valyuta kursini oladigan tool" />
+          <button class="primary-btn slim" id="forgeBtn">Yasash</button>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><b id="statTools">0</b><span>tool</span></div>
+        <div class="stat"><b id="statGenerated">0</b><span>o'zi yozgan</span></div>
+        <div class="stat"><b id="statRuns">0</b><span>ishlash</span></div>
+      </div>
+
+      <div class="tool-list" id="toolList"></div>
+    </section>
+
+    <!-- ================= MODELLAR ================= -->
+    <section class="screen" data-screen="models">
+      <div class="head">
+        <div><p class="eyebrow">RUXSAT BERILGAN AQL</p><h2>Modellar</h2></div>
+        <button class="round-btn" id="refreshModels">↻</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>API kalitlar</strong><span class="muted" id="keyHint">kalit kiriting → modellar chiqadi</span></div>
+        <div class="provider-list" id="providerList"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Mavjud modellar</strong><span class="muted" id="modelCount">0</span></div>
+        <div class="search-row">
+          <input id="modelSearch" placeholder="Model qidirish: gpt, claude, flash, code..." />
+          <select id="providerFilter" class="mini-select"><option value="">Hammasi</option></select>
+        </div>
+        <label class="switch-row compact">
+          <span>Faqat ruxsat berilganlar</span>
+          <input type="checkbox" id="onlyApproved" /><i class="sw"></i>
+        </label>
+        <div class="model-list" id="modelList"><div class="empty">Avval API kalit kiriting</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Yo'naltirish</strong><span class="muted">qaysi ish — qaysi model</span></div>
+        <p class="muted small">Bo'sh qoldirsangiz miya o'zi eng mos modelni tanlaydi.</p>
+        <div class="routing" id="routing"></div>
+      </div>
+    </section>
+
+    <!-- ================= SOZLAMALAR ================= -->
+    <section class="screen" data-screen="settings">
+      <div class="head"><div><p class="eyebrow">KONFIGURATSIYA</p><h2>Sozlamalar</h2></div></div>
+
+      <div class="card">
+        <div class="card-title"><strong>Miya serveri</strong></div>
+        <label class="field">Backend endpoint
+          <input id="endpoint" type="url" inputmode="url" placeholder="https://your-app.up.railway.app" />
+        </label>
+        <label class="field">Kirish tokeni (ixtiyoriy)
+          <input id="appToken" type="password" placeholder="APP_TOKEN" autocomplete="off" />
+        </label>
+        <button class="primary-btn" id="connectBtn">Ulanish va tekshirish</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Telegram</strong><span class="badge" id="tgBadge">off</span></div>
+        <p class="muted small">Topshiriq tugaganda va kalit kerak bo'lganda miya shu yerga yozadi. Siz ham u yerdan topshiriq bera olasiz.</p>
+        <label class="field">Bot token
+          <input id="tgToken" type="password" placeholder="123456:AA..." autocomplete="off" />
+        </label>
+        <label class="field">Chat ID
+          <input id="tgChat" inputmode="numeric" placeholder="123456789" />
+        </label>
+        <div class="btn-row">
+          <button class="primary-btn slim" id="tgSave">Saqlash</button>
+          <button class="ghost-btn" id="tgTest">Test xabar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><strong>Miya xulqi</strong></div>
+        <label class="switch-row">
+          <span><strong>O'z-o'zini yaxshilash</strong><small>Tool yozish va xatoni avtomatik tuzatish</small></span>
+          <input type="checkbox" id="setAutoImprove" checked /><i class="sw"></i>
+        </label>
+        <label class="switch-row">
+          <span><strong>Tugagach xabar berish</strong><small>Telegram + ilovada bildirishnoma</small></span>
+          <input type="checkbox" id="setNotify" checked /><i class="sw"></i>
+        </label>
+        <label class="field">Xatoni tuzatishga urinish soni
+          <input id="setRepair" type="number" min="1" max="6" value="3" />
+        </label>
+        <button class="primary-btn" id="saveSettings">Saqlash</button>
+      </div>
+
+      <p class="note">🔒 API kalitlari faqat serverda saqlanadi, APK ichida emas. Miya ularni topshiriq uchun ishlatadi, ekranga chiqarmaydi.</p>
+    </section>
+  </main>
+
+  <nav class="nav">
+    <button class="nav-item active" data-target="brain"><span>◉</span><small>Miya</small></button>
+    <button class="nav-item" data-target="flow"><span>◴</span><small>Jarayon</small></button>
+    <button class="nav-item" data-target="tools"><span>◈</span><small>Toollar</small></button>
+    <button class="nav-item" data-target="models"><span>✦</span><small>Modellar</small></button>
+    <button class="nav-item" data-target="settings"><span>⚙</span><small>Sozlama</small></button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
 </body>
 </html>

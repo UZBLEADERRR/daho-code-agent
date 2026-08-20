@@ -1,5 +1,11 @@
 {
   "appId": "uz.daho.ilova",
-  "appName": "Ilova",
-  "webDir": "dist"
+  "appName": "Daho",
+  "webDir": "dist",
+  "android": {
+    "backgroundColor": "#05060d"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
 }
