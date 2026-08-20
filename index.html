@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#090b12" />
+  <title>Daho Code</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">✦</span><div><strong>Daho Code</strong><small>Self-expanding coding agent</small></div></div>
+      <button class="icon-btn" id="connectionBtn" aria-label="Ulanish holati"><span class="status-dot"></span></button>
+    </header>
+
+    <main class="screens">
+      <section class="screen active" data-screen="chat">
+        <div class="hero"><p class="eyebrow">AI CODING AGENT</p><h1>Bugun nimani<br><span>quramiz?</span></h1><p class="muted">G‘oyangizni yozing — Daho rejalashtiradi, kodlaydi va ishga tushiradi.</p></div>
+        <div class="model-card"><div><span class="label">MODEL</span><strong id="selectedModel">OpenAI · GPT-4o</strong></div><button class="change-btn" id="modelBtn">O‘zgartirish <span>›</span></button></div>
+        <div class="chat-list" id="chatList"><div class="welcome-card"><span class="spark">✦</span><div><strong>Daho tayyor</strong><p>Men mavjud capability'larimdan foydalanaman. Kerak bo‘lsa, o‘zimga yangi tool yarataman.</p></div></div></div>
+        <div class="composer-wrap"><div class="quick-prompts"><button data-prompt="Loyihamni tahlil qil va yaxshilash rejasini tuz">Loyihani tahlil qil</button><button data-prompt="Menga yangi capability kerak: ">Capability yaratish</button></div><div class="composer"><textarea id="promptInput" rows="1" placeholder="Dahoga topshiriq bering..."></textarea><button class="send-btn" id="sendBtn" aria-label="Yuborish">↑</button></div><small class="hint">Enter — yuborish · Shift+Enter — yangi qator</small></div>
+      </section>
+
+      <section class="screen" data-screen="activity"><div class="section-heading"><div><p class="eyebrow">REAL-TIME</p><h2>Ish jarayoni</h2></div><span class="live-pill"><i></i> LIVE</span></div><div class="progress-card"><div class="progress-top"><strong id="taskStatus">Agent kutmoqda</strong><span id="progressPercent">0%</span></div><div class="progress-bar"><i id="progressBar"></i></div><p id="taskDetail">Yangi topshiriq yuborilganda jarayon shu yerda ko‘rinadi.</p></div><div class="log-card"><div class="card-title"><strong>Agent loglari</strong><button id="clearLogs">Tozalash</button></div><div id="logs"><div class="empty-log">Hozircha loglar yo‘q</div></div></div></section>
+
+      <section class="screen" data-screen="tools"><div class="section-heading"><div><p class="eyebrow">REGISTRY</p><h2>Capability'lar</h2></div><button class="round-btn" id="refreshTools">↻</button></div><p class="muted intro">Daho hozir nimalarni qila olishini ko‘ring.</p><div class="capability-list" id="capabilityList"></div></section>
+
+      <section class="screen" data-screen="settings"><div class="section-heading"><div><p class="eyebrow">CONFIGURATION</p><h2>Sozlamalar</h2></div></div><div class="settings-group"><span class="group-label">AI PROVIDER</span><label class="field-label">Provayder<select id="providerSelect"><option value="openai">OpenAI</option><option value="anthropic">Anthropic</option><option value="gemini">Google Gemini</option><option value="openrouter">OpenRouter</option></select></label><label class="field-label">Model<select id="settingsModel"></select></label><label class="field-label">Backend endpoint<input id="endpointInput" type="url" placeholder="https://your-app.up.railway.app" /></label></div><div class="settings-group"><span class="group-label">AGENT MODE</span><label class="toggle-row"><span><strong>Avtomatik self-improvement</strong><small>Testdan so‘ng branch push va deploy</small></span><input id="autoImprove" type="checkbox" checked /><i class="toggle"></i></label><label class="toggle-row"><span><strong>Demo rejim</strong><small>Backend ulanmaganda simulyatsiya</small></span><input id="demoMode" type="checkbox" checked /><i class="toggle"></i></label></div><button class="primary-btn" id="saveSettings">Sozlamalarni saqlash</button><p class="security-note">🔒 API kalitlari bu APK’da saqlanmaydi. Ularni Railway Variables’da sozlang.</p></section>
+    </main>
+    <nav class="bottom-nav"><button class="nav-item active" data-target="chat"><span>⌂</span><small>Chat</small></button><button class="nav-item" data-target="activity"><span>◴</span><small>Jarayon</small></button><button class="nav-item" data-target="tools"><span>◈</span><small>Tools</small></button><button class="nav-item" data-target="settings"><span>⚙</span><small>Sozlamalar</small></button></nav>
+  </div><div class="toast" id="toast"></div><script src="app.js"></script>
+</body>
+</html>
