@@ -201,6 +201,21 @@
       </div>
 
       <div class="card">
+        <div class="card-title"><strong>GitHub</strong><span class="badge" id="ghBadge">off</span></div>
+        <p class="muted small">Token bilan miya repolarni o'qiydi, kod yuboradi, PR ochadi, Actions'ni ishga tushiradi va GitHub Pages'ga chiqaradi.</p>
+        <label class="field">Token (repo + workflow ruxsati)
+          <input id="ghToken" type="password" placeholder="ghp_..." autocomplete="off" />
+        </label>
+        <label class="field">Standart repo
+          <input id="ghRepo" placeholder="owner/repo" autocomplete="off" />
+        </label>
+        <label class="field">Tarmoq
+          <input id="ghBranch" placeholder="main" />
+        </label>
+        <button class="primary-btn" id="ghSave">Saqlash va tekshirish</button>
+      </div>
+
+      <div class="card">
         <div class="card-title"><strong>Miya xulqi</strong></div>
         <label class="switch-row">
           <span><strong>O'z-o'zini yaxshilash</strong><small>Tool yozish va xatoni avtomatik tuzatish</small></span>

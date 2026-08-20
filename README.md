@@ -19,6 +19,8 @@ APK (Capacitor)  ──HTTPS──►  Miya serveri (Node, dependency'siz)
 - **"Qilolmayman" yo'q** — imkoni bo'lmasa sababini aytadi, alternativ yo'l topadi yoki aniq nima kerakligini so'raydi.
 - **Model tanlash** — API kalit kiritilgach mavjud modellar ro'yxati chiqadi, qidiruv bor; siz ruxsat berganlari orasidan topshiriqqa mosini o'zi tanlaydi.
 - **Telegram** — natija shu yerga tushadi; kalit kerak bo'lsa shu yerdan so'raydi; siz ham u yerdan topshiriq bera olasiz.
+- **GitHub qo'llari** — repo o'qish/yozish (bitta commit), tarmoq, PR, issue, reliz, kod qidiruv, Actions'ni ishga tushirib yiqilgan job logini o'qish va GitHub Pages'ga chiqarish.
+- **O'z ishini sinaydi** — `test_app` veb loyihani headless brauzerda haqiqatan ishga tushiradi: JS xatolari, bo'sh sahifa, chizilgan tugma va matnlar ko'rinadi; xato bo'lsa miya tuzatib qayta sinaydi.
 
 ## Ishga tushirish
 
@@ -45,7 +47,8 @@ GitHub Actions (`.github/workflows/apk.yml`) har push'da APK yig'ib, Release'ga 
 
 1. **Sozlamalar** → Backend endpoint (Railway URL) → *Ulanish va tekshirish*
 2. **Modellar** → API kalit qo'ying → modellar ro'yxati chiqadi → keraklilariga ruxsat bering
-3. **Sozlamalar → Telegram** → bot token + chat ID → *Test xabar*
-4. **Miya** ekranida topshiriq yozing.
+3. **Sozlamalar → GitHub** → token (`repo` + `workflow`) + standart repo
+4. **Sozlamalar → Telegram** → bot token + chat ID → *Test xabar*
+5. **Miya** ekranida topshiriq yozing.
 
 To'liq API va xavfsizlik hujjati: [BACKEND.md](BACKEND.md)

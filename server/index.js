@@ -66,6 +66,11 @@ function snapshot() {
         chatId: s.settings.telegram.chatId,
         hasToken: Boolean(s.settings.telegram.botToken),
       },
+      github: {
+        repo: s.settings.github?.repo || '',
+        branch: s.settings.github?.branch || 'main',
+        hasToken: Boolean(s.settings.github?.token),
+      },
     },
     tools: tools.list(),
     missions: brain.listMissions().slice(0, 20),
@@ -197,6 +202,30 @@ const routes = {
   'GET /api/blockers': async () => ({ blockers: brain.openBlockers() }),
   'POST /api/blockers/answer': async (body) =>
     brain.resolveBlocker({ blockerId: body.id, provider: body.provider, value: body.value }),
+
+  'POST /api/github': async (body) => {
+    const s = db();
+    const g = s.settings.github;
+    if (body.token) g.token = String(body.token).trim();
+    if (body.token === '') g.token = '';
+    if (body.repo !== undefined) g.repo = String(body.repo).trim();
+    if (body.branch) g.branch = String(body.branch).trim();
+    save();
+    if (g.token) {
+      // Tokenni darhol tekshiramiz — noto'g'ri bo'lsa miya keyin ovora bo'lmasin.
+      const res = await fetch('https://api.github.com/user', {
+        headers: { Authorization: `Bearer ${g.token}`, 'User-Agent': 'daho-brain', Accept: 'application/vnd.github+json' },
+      });
+      if (!res.ok) {
+        g.token = '';
+        save();
+        throw new Error(`GitHub tokeni ishlamadi (${res.status})`);
+      }
+      const me = await res.json();
+      return { github: { repo: g.repo, branch: g.branch, hasToken: true, login: me.login } };
+    }
+    return { github: { repo: g.repo, branch: g.branch, hasToken: false } };
+  },
 
   'POST /api/telegram': async (body) => ({ telegram: tg.setConfig(body) }),
   'POST /api/telegram/test': async () => {

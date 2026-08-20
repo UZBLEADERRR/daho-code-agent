@@ -62,7 +62,7 @@ export async function askFor(blocker) {
     blocker.why ? `<b>Sabab:</b> ${escapeHtml(blocker.why)}` : '',
     '',
     'Javobni shu yerga yozing:',
-    blocker.kind === 'api_key'
+    blocker.kind === 'api_key' || blocker.kind === 'github_token'
       ? `<code>key ${blocker.provider || 'provider'} QIYMAT</code>`
       : `<code>javob ${blocker.id} MATN</code>`,
   ].filter(Boolean);

@@ -263,6 +263,13 @@ function renderSettings() {
   $('#setRepair').value = s.maxSelfRepair ?? 3;
   $('#tgChat').value = s.telegram?.chatId || '';
   if (s.telegram?.hasToken) $('#tgToken').placeholder = '•••••• saqlangan';
+
+  const gh = s.github || {};
+  $('#ghRepo').value = gh.repo || '';
+  $('#ghBranch').value = gh.branch || 'main';
+  if (gh.hasToken) $('#ghToken').placeholder = '•••••• saqlangan';
+  $('#ghBadge').textContent = gh.hasToken ? 'ulangan' : 'off';
+  $('#ghBadge').className = 'badge ' + (gh.hasToken ? 'done' : '');
 }
 
 /* --------------------------------------------------------------- connection */
@@ -526,6 +533,30 @@ $('#tgTest').onclick = async () => {
     await api('/api/telegram/test', { method: 'POST' });
     toast('Test xabari yuborildi', 'ok');
   } catch (e) { toast(e.message, 'err'); }
+};
+
+$('#ghSave').onclick = async () => {
+  const btn = $('#ghSave');
+  btn.disabled = true;
+  btn.textContent = 'Tekshirilmoqda...';
+  try {
+    const r = await api('/api/github', {
+      method: 'POST',
+      body: {
+        token: $('#ghToken').value.trim() || undefined,
+        repo: $('#ghRepo').value.trim(),
+        branch: $('#ghBranch').value.trim() || 'main',
+      },
+    });
+    $('#ghToken').value = '';
+    toast(r.github.login ? `GitHub: ${r.github.login}` : 'GitHub saqlandi', 'ok');
+    scheduleRefresh();
+  } catch (e) {
+    toast(e.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Saqlash va tekshirish';
+  }
 };
 
 $('#saveSettings').onclick = async () => {

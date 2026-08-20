@@ -13,7 +13,7 @@ server/
   lib/tools.js        tool registri va versiyalari
   lib/sandbox.js      toolni alohida protsessda, timeout bilan bajarish
   lib/telegram.js     xabar berish, kalit so'rash, javob va topshiriq qabul qilish
-  tools/              builtin toollar (http_request, fs_read, fs_write, shell_run, telegram_notify)
+  tools/              builtin toollar (quyidagi jadvalga qarang)
 ```
 
 ## Topshiriq oqimi
@@ -51,6 +51,7 @@ server/
 | POST | `/api/mission/retry` | `{id, replan?}` |
 | GET | `/api/blockers` | ochiq so'rovlar |
 | POST | `/api/blockers/answer` | `{id \| provider, value}` — javob berish va davom ettirish |
+| POST | `/api/github` | `{token, repo, branch}` — token darhol tekshiriladi |
 | POST | `/api/telegram` | `{botToken, chatId, enabled}` |
 | POST | `/api/telegram/test` | test xabari |
 | POST | `/api/settings` | `{autoImprove, notifyOnFinish, maxSelfRepair}` |
@@ -61,13 +62,47 @@ server/
 | Xabar | Natija |
 |---|---|
 | `key openai sk-...` | kalit saqlanadi, modellar yuklanadi, to'xtagan topshiriq davom etadi |
+| `key github ghp_...` | GitHub tokeni tekshiriladi va saqlanadi, ish davom etadi |
 | `javob <blocker_id> matn` | ochiq so'rovga javob |
 | `topshiriq <matn>` | yangi topshiriq ochiladi |
 | oddiy matn | ochiq so'rov bo'lsa — javob, aks holda yangi topshiriq |
 
 ## Toollar
 
-Builtin: `http_request`, `fs_read`, `fs_write`, `shell_run`, `telegram_notify`.
+**Asosiy**
+
+| Tool | Vazifa |
+|---|---|
+| `http_request` | HTTP so'rov |
+| `fs_read` / `fs_write` | workspace ichida fayl o'qish/yozish |
+| `shell_run` | workspace ichida terminal buyrug'i (`ALLOW_SHELL=false` bilan o'chadi) |
+| `telegram_notify` | egasiga xabar |
+
+**GitHub qo'llari** (token: sozlamalar → GitHub, yoki `GITHUB_TOKEN`)
+
+| Tool | Vazifa |
+|---|---|
+| `github_read` | repodagi fayl yoki papkani o'qish |
+| `github_write` | bir nechta faylni **bitta commit** bilan yuborish yoki o'chirish (tarmoq yo'q bo'lsa o'zi ochadi) |
+| `github_repo` | repolarni ko'rish, yangi repo ochish, tavsif/topiklarni o'zgartirish |
+| `github_branch` | tarmoq ro'yxati va yangi tarmoq |
+| `github_pr` | PR ochish, ro'yxatlash, merge |
+| `github_issue` | issue ochish, izoh, yopish |
+| `github_release` | reliz ro'yxati va yaratish (APK fayllari shu yerda) |
+| `github_search` | kod qidirish |
+| `github_workflow` | Actions: `run` → `status` → `logs` (yiqilgan job logidan xato qatorlari) → `artifacts` |
+| `github_pages` | GitHub Pages'ga chiqarish, jonli havola, o'z domeni |
+
+**O'z ishini sinash**
+
+`test_app` — veb loyihani **haqiqatan ishga tushiradi**: `<link href="style.css">` va
+`<script src="app.js">` sahifaga singdiriladi, headless brauzerda ochiladi va qaytadi:
+JS xatolari (qator raqami bilan), konsol ogohlantirishlari, sarlavhalar, tugmalar,
+maydonlar, ko'ringan matn, element soni va sahifa bo'sh chiqqani.
+
+Brauzer topilmasa (`CHROME_PATH`, `/usr/bin/chromium`, Playwright papkasi qaraladi)
+tool rad javob bermaydi — JS fayllarning sintaksisini tekshirib, brauzer kerakligini
+aniq aytadi. Railway'da: `NIXPACKS_PKGS=chromium` + `CHROME_PATH=/usr/bin/chromium`.
 
 Miya yozgan toollar `DATA_DIR/tools/<nom>.v<N>.mjs` fayllarida versiyalanadi va shu shaklda bo'ladi:
 
@@ -86,5 +121,7 @@ sintaksis xatosi bo'lgan kod registrga umuman qo'shilmaydi.
 - Kalitlar `state.json` da, faqat serverda; API javoblarida `sk-••••abcd` ko'rinishida.
 - Fayl toollari `ALLOWED_WORKSPACE` dan tashqariga chiqmaydi.
 - `shell_run` ni `ALLOW_SHELL=false` bilan butunlay o'chirish mumkin.
+- GitHub tokeni ham `state.json` da, faqat serverda; ilovaga `hasToken: true` ko'rinishida ko'rsatiladi.
+- Tokenga minimal ruxsat bering: `repo` + `workflow`. Miya to'g'ridan-to'g'ri `main` ga emas, tarmoq + PR orqali ishlashi tavsiya etiladi.
 - Ochiq internetga qo'yilgan serverda `APP_TOKEN` ni albatta o'rnating.
 - Volume ulanmasa, deploydan keyin holat (kalitlar, toollar, tarix) yo'qoladi.

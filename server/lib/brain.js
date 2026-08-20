@@ -20,7 +20,9 @@ QONUNLAR:
 3. Agar tool xato bersa — sababini aniqlab, toolni tuzatib, qayta urinasan.
 4. Agar haqiqatan tashqi resurs kerak bo'lsa (API kalit, parol, ruxsat) — aniq nomini ayt va so'ra. Bu "qilolmayman" emas, bu "shu bitta narsa kerak".
 5. Javoblar o'zbek tilida, aniq va amaliy bo'ladi.
-6. Faqat so'ralgan JSON formatda javob ber, boshqa matn qo'shma.`;
+6. Faqat so'ralgan JSON formatda javob ber, boshqa matn qo'shma.
+7. O'Z ISHINGNI SINA: veb (HTML/JS) kod yozgan yoki o'zgartirgan bo'lsang, oxirida albatta \`test_app\` qadamini qo'sh. Xato chiqsa — tuzat va qayta sina.
+8. GitHub bilan ishlashda repo har doim "owner/repo" ko'rinishida beriladi. Kodni yuborgach \`github_workflow\` bilan yig'ilish natijasini tekshir, yiqilsa logini o'qib tuzat.`;
 
 const REFUSAL = /(qilolmayman|qila olmayman|imkonim yo'?q|imkoniyatim yo'?q|men shunchaki|i can'?t|i cannot|unable to assist|as an ai)/i;
 
@@ -145,7 +147,14 @@ export async function resolveBlocker({ blockerId, provider, value }) {
   }
   if (!blocker) return { ok: false, error: 'Kutilayotgan so\'rov topilmadi' };
 
-  if (blocker.kind === 'api_key' && blocker.provider) {
+  if (blocker.kind === 'github_token' || blocker.provider === 'github') {
+    const check = await saveGithubToken(String(value).trim());
+    if (!check.ok) {
+      await tg.send(`⚠️ GitHub tokeni ishlamadi: ${check.error}. Yangisini yuboring: <code>key github TOKEN</code>`);
+      return { ok: false, error: check.error };
+    }
+    await tg.send(`✅ GitHub tokeni qabul qilindi (${check.login}). Ish davom etmoqda.`);
+  } else if (blocker.kind === 'api_key' && blocker.provider) {
     s.keys[blocker.provider] = String(value).trim();
     save();
     try {
@@ -172,6 +181,24 @@ export async function resolveBlocker({ blockerId, provider, value }) {
   logTo(mission, `▶️ Javob olindi: ${blocker.title}`, 'ok');
   runMission(mission).catch(() => {});
   return { ok: true, missionId: mission.id };
+}
+
+/** GitHub tokenini tekshiradi va sozlamalarga saqlaydi. */
+export async function saveGithubToken(value) {
+  const s = db();
+  try {
+    const base = (process.env.GITHUB_API_URL || 'https://api.github.com').replace(/\/+$/, '');
+    const res = await fetch(`${base}/user`, {
+      headers: { Authorization: `Bearer ${value}`, 'User-Agent': 'daho-brain', Accept: 'application/vnd.github+json' },
+    });
+    if (!res.ok) return { ok: false, error: `GitHub javobi ${res.status}` };
+    const me = await res.json().catch(() => ({}));
+    s.settings.github.token = value;
+    save();
+    return { ok: true, login: me.login || 'ok' };
+  } catch (e) {
+    return { ok: false, error: String(e.message || e) };
+  }
 }
 
 /* --------------------------------------------------------------- self-improve */
@@ -340,13 +367,15 @@ async function runStep(mission, step) {
     step.error = res.error;
     logTo(mission, `✗ ${step.tool}: ${String(res.error).slice(0, 200)}`, 'error');
 
-    if (/api kalit|api key|unauthorized|401|403|token/i.test(String(res.error))) {
-      const provider = (String(res.error).match(/(openai|anthropic|gemini|openrouter)/i) || [])[1]?.toLowerCase();
+    if (/api kalit|api key|unauthorized|401|403|token|bad credentials/i.test(String(res.error))) {
+      const text = String(res.error);
+      const provider = (text.match(/(openai|anthropic|gemini|openrouter)/i) || [])[1]?.toLowerCase();
+      const isGithub = !provider && /github/i.test(text);
       await raiseBlocker(mission, {
-        kind: provider ? 'api_key' : 'secret',
-        provider,
-        title: provider ? `${provider} API kaliti` : `"${step.tool}" uchun maxfiy qiymat`,
-        why: String(res.error).slice(0, 300),
+        kind: isGithub ? 'github_token' : provider ? 'api_key' : 'secret',
+        provider: isGithub ? 'github' : provider,
+        title: isGithub ? 'GitHub tokeni (repo + workflow ruxsati)' : provider ? `${provider} API kaliti` : `"${step.tool}" uchun maxfiy qiymat`,
+        why: text.slice(0, 300),
       });
       step.status = 'blocked';
       save();
@@ -512,6 +541,14 @@ export const openBlockers = pendingBlockers;
 /** Telegram'dan kelgan xabarlarni ulash: kalit, javob yoki yangi topshiriq. */
 export function wireTelegram() {
   tg.onAnswer(async (parsed) => {
+    if (parsed.kind === 'api_key' && parsed.provider === 'github') {
+      const r = await resolveBlocker({ provider: 'github', value: parsed.value });
+      if (!r.ok) {
+        const check = await saveGithubToken(parsed.value.trim());
+        await tg.send(check.ok ? `✅ GitHub tokeni saqlandi (${check.login}).` : `⚠️ GitHub tokeni ishlamadi: ${check.error}`);
+      }
+      return;
+    }
     if (parsed.kind === 'api_key') {
       const r = await resolveBlocker({ provider: parsed.provider, value: parsed.value });
       if (!r.ok) {

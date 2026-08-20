@@ -18,6 +18,20 @@ const BUILTINS = [
   { name: 'fs_write', description: 'Workspace ichiga fayl yozadi', input: '{path, content, append?}', tags: ['fs'] },
   { name: 'shell_run', description: 'Workspace ichida terminal buyrug\'ini bajaradi', input: '{command, timeout?}', tags: ['ops'] },
   { name: 'telegram_notify', description: 'Egasiga Telegram orqali xabar yuboradi', input: '{text}', tags: ['notify'] },
+
+  // GitHub qo'llari — repo o'qish/yozishdan tortib nashr qilishgacha.
+  { name: 'github_read', description: 'GitHub repodagi fayl yoki papkani o\'qiydi', input: '{repo:"owner/repo", path?, branch?}', tags: ['github'] },
+  { name: 'github_write', description: 'Fayllarni bitta commit bilan repoga yozadi yoki o\'chiradi', input: '{repo, branch?, message?, files:[{path,content}]}', tags: ['github'] },
+  { name: 'github_repo', description: 'Repolarni ko\'radi, yangi repo ochadi, sozlamalarini o\'zgartiradi', input: '{action:"list|get|create|settings", repo?, name?, private?, topics?}', tags: ['github'] },
+  { name: 'github_branch', description: 'Tarmoqlarni ko\'radi yoki yangi tarmoq ochadi', input: '{repo, action:"list|create", name?, from?}', tags: ['github'] },
+  { name: 'github_pr', description: 'Pull request ochadi, ro\'yxatlaydi yoki merge qiladi', input: '{repo, action:"list|get|create|merge", head?, base?, title?, number?}', tags: ['github'] },
+  { name: 'github_issue', description: 'Issue ochadi, izoh yozadi, yopadi', input: '{repo, action:"list|create|comment|close", number?, title?, body?}', tags: ['github'] },
+  { name: 'github_release', description: 'Reliz yaratadi yoki ro\'yxatlaydi (APK fayllari shu yerda)', input: '{repo, action:"list|latest|create", tag?, name?}', tags: ['github'] },
+  { name: 'github_search', description: 'GitHub bo\'ylab yoki bitta repo ichida kod qidiradi', input: '{q, repo?}', tags: ['github'] },
+  { name: 'github_workflow', description: 'GitHub Actions: ish oqimini ishga tushiradi, holatini va yiqilgan job logini o\'qiydi', input: '{repo, action:"list|run|status|logs|artifacts", workflow?, ref?, run_id?}', tags: ['github', 'ci'] },
+  { name: 'github_pages', description: 'Loyihani GitHub Pages orqali internetga chiqaradi va jonli havola beradi', input: '{repo, branch?, path?, domain?}', tags: ['github', 'deploy'] },
+
+  { name: 'test_app', description: 'Veb loyihani HAQIQATAN headless brauzerda ishga tushirib sinaydi: JS xatolari, bo\'sh sahifa, chizilgan tugma va matnlar. Veb kodni o\'zgartirgach har safar chaqir', input: '{entry?:"index.html", dir?, wait?}', tags: ['test'] },
 ];
 
 export function ensureSetup() {
@@ -150,6 +164,10 @@ export async function runTool(name, input = {}, { timeout = 90000 } = {}) {
   const env = {
     TELEGRAM_BOT_TOKEN: s.settings.telegram.botToken || '',
     TELEGRAM_CHAT_ID: s.settings.telegram.chatId || '',
+    GITHUB_TOKEN: s.settings.github?.token || '',
+    GITHUB_REPO_FULL: s.settings.github?.repo || '',
+    GITHUB_BRANCH: s.settings.github?.branch || 'main',
+    GITHUB_API_URL: process.env.GITHUB_API_URL || '',
     ALLOW_SHELL: process.env.ALLOW_SHELL ?? 'true',
   };
   const started = Date.now();

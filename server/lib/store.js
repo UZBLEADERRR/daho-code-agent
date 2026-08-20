@@ -18,6 +18,7 @@ const EMPTY = {
     autoApproveNewTools: true,
     maxSelfRepair: 3,
     telegram: { botToken: '', chatId: '', enabled: false },
+    github: { token: '', repo: '', branch: 'main' },
     notifyOnFinish: true,
   },
 };
@@ -41,6 +42,14 @@ function seedFromEnv(s) {
   if (bt && !s.settings.telegram.botToken) s.settings.telegram.botToken = bt;
   if (cid && !s.settings.telegram.chatId) s.settings.telegram.chatId = cid;
   if (s.settings.telegram.botToken && s.settings.telegram.chatId) s.settings.telegram.enabled = true;
+
+  const ghToken = (process.env.GITHUB_TOKEN || '').trim();
+  if (ghToken && !s.settings.github.token) s.settings.github.token = ghToken;
+  const owner = (process.env.GITHUB_OWNER || '').trim();
+  const repo = (process.env.GITHUB_REPO || '').trim();
+  if (owner && repo && !s.settings.github.repo) s.settings.github.repo = `${owner}/${repo}`;
+  const branch = (process.env.GITHUB_BRANCH || '').trim();
+  if (branch) s.settings.github.branch = branch;
   return s;
 }
 
@@ -52,6 +61,7 @@ export function load() {
       state = { ...structuredClone(EMPTY), ...JSON.parse(readFileSync(FILE, 'utf8')) };
       state.settings = { ...EMPTY.settings, ...state.settings };
       state.settings.telegram = { ...EMPTY.settings.telegram, ...state.settings.telegram };
+      state.settings.github = { ...EMPTY.settings.github, ...state.settings.github };
     } catch {
       state = structuredClone(EMPTY);
     }
